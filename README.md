@@ -2,7 +2,7 @@
 
 The goal of this test is to check how you'd handle day-to-day tasks at AvantStay. 
 
-It should be implemented using React and you can use `create-react-app` to start it.
+It should be implemented using React and you can use `create-react-app` or `next.js` as base framework.
 
 ## What's gonna be taken into consideration?
 
