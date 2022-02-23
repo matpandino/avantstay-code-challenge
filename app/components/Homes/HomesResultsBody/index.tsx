@@ -8,7 +8,7 @@ import HomeResultItem from "./HomeResultItem";
 import HomesNoResults from "./HomesNoResults";
 
 const HomesResultsBody: React.FC = () => {
-  const { homesData, loadNextPage } = useHomes();
+  const { homesData, loadNextPage, pricesLoading } = useHomes();
   const { homes } = homesData as HomeQueryResponse;
   const hasMore = homes.count !== homes.results.length;
 
@@ -18,9 +18,10 @@ const HomesResultsBody: React.FC = () => {
 
   return (
     <Container>
+      {hasMore ? "true hasMore" : " false hasMore"}
       <InfiniteScroll
         dataLength={homes.results.length}
-        next={loadNextPage}
+        next={() => loadNextPage()}
         hasMore={hasMore}
         scrollableTarget="content"
         loader={
@@ -30,7 +31,11 @@ const HomesResultsBody: React.FC = () => {
         }
       >
         {homes.results.map((home) => (
-          <HomeResultItem key={home.id} data={home} />
+          <HomeResultItem
+            key={home.id}
+            data={home}
+            loadingPrices={pricesLoading}
+          />
         ))}
       </InfiniteScroll>
     </Container>

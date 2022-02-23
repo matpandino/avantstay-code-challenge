@@ -69,10 +69,8 @@ const FiltersFields = () => {
                 console.log(value);
                 setFilters({
                   ...filters,
-                  period: {
-                    checkIn: value.startDate,
-                    checkOut: value.endDate,
-                  },
+                  checkIn: value.startDate,
+                  checkOut: value.endDate,
                 });
               }}
             />

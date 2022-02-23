@@ -15,10 +15,16 @@ export type Home = {
   hasPool: boolean;
   amenities: string[];
   seasonPricing: HomeSeasonPricing;
+  homePricing?: HomesPricing;
   regionName: string;
   cityName: string;
   stateName: string;
   stateCode: string;
+};
+
+export type HomesPricing = {
+  numberOfNights: number;
+  total: number;
 };
 
 export type HomeSeasonPricing = {

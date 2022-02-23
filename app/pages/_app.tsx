@@ -4,10 +4,13 @@ import GlobalStyle from "../theme/globalStyle";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import Layout from "../components/layout";
 import HomesProvider from "../contexts/HomesContext";
+import { relayStylePagination } from "@apollo/client/utilities";
+
+const cache = new InMemoryCache({});
 
 const client = new ApolloClient({
   uri: "https://fake-api.avantstay.dev/graphql",
-  cache: new InMemoryCache(),
+  cache: cache,
 });
 
 class MyApp extends App {

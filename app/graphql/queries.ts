@@ -4,7 +4,7 @@ export const QUERY_HOMES = gql`
   query homes(
     $page: Int!
     $pageSize: Int!
-    $guests: Int
+    $guests: Int!
     $order: HomesOrder
     $region: UUID
   ) {
@@ -60,7 +60,7 @@ export const QUERY_HOMES_PRICING = gql`
 `;
 
 export const QUERY_REGIONS = gql`
-  {
+  query regions {
     regions {
       id
       name

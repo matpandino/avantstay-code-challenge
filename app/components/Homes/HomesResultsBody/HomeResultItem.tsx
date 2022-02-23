@@ -19,9 +19,11 @@ import UserIcon from "../../../assets/arrangmentsIcons/user.svg";
 import PoolIcon from "../../../assets/arrangmentsIcons/pool.svg";
 import HighIcon from "../../../assets/high.svg";
 import LowIcon from "../../../assets/low.svg";
+import Skeleton from "react-loading-skeleton";
 
 type HomeResultItemProps = {
   data: Home;
+  loadingPrices: boolean;
 };
 
 type ArrangementsProps = {
@@ -34,7 +36,15 @@ type SeasonPricingProps = {
   maxPrice: number;
 };
 
-const HomeResultItem: React.FC<HomeResultItemProps> = ({ data: home }) => {
+type PricingProps = {
+  total: number;
+  numberOfNights: number;
+};
+
+const HomeResultItem: React.FC<HomeResultItemProps> = ({
+  data: home,
+  loadingPrices,
+}) => {
   return (
     <ContainerHomeResult>
       <ContainerImage>
@@ -54,18 +64,31 @@ const HomeResultItem: React.FC<HomeResultItemProps> = ({ data: home }) => {
         <TitleText>{home.title}</TitleText>
         <Arrangements data={home} />
 
-        <SeasonPricingsContainer>
-          <SeasonPricing
-            type="lowSeason"
-            minPrice={home.seasonPricing.lowSeason.minPrice}
-            maxPrice={home.seasonPricing.lowSeason.maxPrice}
+        {loadingPrices ? (
+          <div>
+            <Skeleton height="17px" width="34%" borderRadius="2px" />
+            <Skeleton height="28px" width="41%" borderRadius="2px" />
+            <Skeleton height="17px" width="15%" borderRadius="2px" />
+          </div>
+        ) : !!home?.homePricing?.total ? (
+          <TotalPricing
+            total={home.homePricing.total}
+            numberOfNights={home.homePricing.numberOfNights}
           />
-          <SeasonPricing
-            type="highSeason"
-            minPrice={home.seasonPricing.highSeason.minPrice}
-            maxPrice={home.seasonPricing.highSeason.maxPrice}
-          />
-        </SeasonPricingsContainer>
+        ) : (
+          <SeasonPricingsContainer>
+            <SeasonPricing
+              type="lowSeason"
+              minPrice={home.seasonPricing.lowSeason.minPrice}
+              maxPrice={home.seasonPricing.lowSeason.maxPrice}
+            />
+            <SeasonPricing
+              type="highSeason"
+              minPrice={home.seasonPricing.highSeason.minPrice}
+              maxPrice={home.seasonPricing.highSeason.maxPrice}
+            />
+          </SeasonPricingsContainer>
+        )}
       </ContainerInfo>
     </ContainerHomeResult>
   );
@@ -102,22 +125,37 @@ const SeasonPricing: React.FC<SeasonPricingProps> = ({
   maxPrice,
 }) => {
   const isHighSeason = type === "highSeason";
+
   return (
-    <SeasonPricingContainer>
-      <SmallText>
-        <Image
-          src={isHighSeason ? HighIcon : LowIcon}
-          alt={isHighSeason ? "Arrow Up Icon" : "Arrow Down Icon"}
-          width={16}
-          height={16}
-        />
-        {isHighSeason ? "Prime Season" : "Budget Season"}
-      </SmallText>
-      <PriceText>
-        {formatCurrency(minPrice)} - {formatCurrency(maxPrice)}
-      </PriceText>
-      <SmallText>per night</SmallText>
-    </SeasonPricingContainer>
+    <>
+      <SeasonPricingContainer>
+        <SmallText>
+          <Image
+            src={isHighSeason ? HighIcon : LowIcon}
+            alt={isHighSeason ? "Arrow Up Icon" : "Arrow Down Icon"}
+            width={16}
+            height={16}
+          />
+          {isHighSeason ? "Prime Season" : "Budget Season"}
+        </SmallText>
+        <PriceText>
+          {formatCurrency(minPrice)} - {formatCurrency(maxPrice)}
+        </PriceText>
+        <SmallText>per night</SmallText>
+      </SeasonPricingContainer>
+    </>
+  );
+};
+
+const TotalPricing: React.FC<PricingProps> = ({ total, numberOfNights }) => {
+  return (
+    <>
+      <SeasonPricingContainer>
+        <SmallText>Total - {numberOfNights} nights</SmallText>
+        <PriceText>{formatCurrency(total)}</PriceText>
+        <SmallText>per night</SmallText>
+      </SeasonPricingContainer>
+    </>
   );
 };
 

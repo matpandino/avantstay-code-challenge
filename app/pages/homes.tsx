@@ -17,11 +17,12 @@ const Homes = () => {
     setLoadingResults(loading);
   }, [loading]);
 
-  if (error) return <p>error: {error.message}</p>;
+  if (error) return <p>error: {console.log({ error })}</p>;
 
   return (
     <Container>
       {pricesLoading && "pricesLoading"}
+      {console.log("call homesDatahomesDatahomesData", homesData)}
       <HomesHeader
         loading={loadingResults}
         homesCount={homesData?.homes?.count}
