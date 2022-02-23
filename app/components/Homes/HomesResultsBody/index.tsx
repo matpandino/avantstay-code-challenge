@@ -19,25 +19,27 @@ const HomesResultsBody: React.FC = () => {
   return (
     <Container>
       {hasMore ? "true hasMore" : " false hasMore"}
-      <InfiniteScroll
-        dataLength={homes.results.length}
-        next={() => loadNextPage()}
-        hasMore={hasMore}
-        scrollableTarget="content"
-        loader={
-          <LoadingMore>
-            <span>Loading more homes...</span>
-          </LoadingMore>
-        }
-      >
-        {homes.results.map((home) => (
-          <HomeResultItem
-            key={home.id}
-            data={home}
-            loadingPrices={pricesLoading}
-          />
-        ))}
-      </InfiniteScroll>
+      {
+        <InfiniteScroll
+          dataLength={homes.results.length}
+          next={() => loadNextPage()}
+          hasMore={hasMore}
+          scrollableTarget="content"
+          loader={
+            <LoadingMore>
+              <span>Loading more homes...</span>
+            </LoadingMore>
+          }
+        >
+          {homes.results.map((home) => (
+            <HomeResultItem
+              key={home.id}
+              data={home}
+              loadingPrices={pricesLoading}
+            />
+          ))}
+        </InfiniteScroll>
+      }
     </Container>
   );
 };

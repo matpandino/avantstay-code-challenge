@@ -5,18 +5,10 @@ import {
   useEffect,
   Dispatch,
   SetStateAction,
-  useCallback,
 } from "react";
 import { format } from "date-fns";
 import { HomeQueryResponse } from "../types";
-import {
-  ApolloError,
-  LazyQueryResult,
-  OperationVariables,
-  QueryLazyOptions,
-  useLazyQuery,
-  useQuery,
-} from "@apollo/client";
+import { ApolloError, useLazyQuery, useQuery } from "@apollo/client";
 import {
   QUERY_HOMES,
   QUERY_HOMES_PRICING,
@@ -31,7 +23,7 @@ interface IContextProps {
   filters: IFilters;
   setFilters: Dispatch<SetStateAction<IFilters>>;
   error: ApolloError | undefined;
-  loadNextPage: () => Promise<void>;
+  loadNextPage: () => void;
 }
 type IFilters = {
   order: string;
@@ -55,80 +47,99 @@ const HomesProvider: React.FC = ({ children }) => {
   const [parsedHomesData, setParsedHomesData] = useState<any>(null);
 
   const { data: regionsData } = useQuery(QUERY_REGIONS);
-  const {
-    data: homesData,
-    loading,
-    error,
-    fetchMore,
-    called,
-
-    refetch,
-    updateQuery,
-  } = useQuery(QUERY_HOMES, {
-    variables: {
-      guests: filters.guests,
-      region: filters.region,
-      order: filters.order,
-      page: currentPage,
-      pageSize: PAGE_SIZE,
-    },
+  const [
+    getHomes,
+    { data: homesData, loading, error, fetchMore, refetch, client, called },
+  ] = useLazyQuery(QUERY_HOMES, {
+    onCompleted: (data) => handleHomesData(data),
+    fetchPolicy: "cache-and-network",
+    notifyOnNetworkStatusChange: true,
   });
   const [
     getHomesPrice,
     { loading: pricesLoading, error: pricesError, data: pricesData },
-  ] = useLazyQuery(QUERY_HOMES_PRICING);
+  ] = useLazyQuery(QUERY_HOMES_PRICING, {
+    notifyOnNetworkStatusChange: true,
+  });
 
-  const updateCacheValues = async () => {
-    await updateQuery(async (prevValue) => {
-      console.log("call aaa", prevValue?.homes?.results);
-      if (!!prevValue?.homes?.results === false) return prevValue;
+  useEffect(() => {
+    setParsedHomesData(homesData);
+  }, [homesData]);
 
-      if (filters.checkIn && filters.checkOut) {
-        const homeIds = prevValue?.homes?.results.map((h) => h.id);
-        const resPrices = await getHomesPrice({
-          variables: {
-            ids: homeIds,
-            checkIn: format(filters.checkIn, "yyyy-MM-dd"),
-            checkOut: format(filters.checkOut, "yyyy-MM-dd"),
-          },
-        });
-        console.log("call resPrices", resPrices);
-        const { homesPricing } = resPrices.data;
-        console.log("call homesPricing", homesPricing);
-        const parsedNewResults = prevValue.homes.results.map((h: any) => {
-          const homesPricingData = homesPricing.find(
-            (hp) => hp.homeId === h.id
-          );
-          return { ...h, homePricing: { ...homesPricingData } };
-        });
-        const newValue = {
-          homes: {
-            results: [...parsedNewResults],
-            count: prevValue.homes.count + 333,
-          },
-        };
-        console.log("call newValue", newValue);
-        return { ...newValue };
-      } else {
-        return {
-          homes: {
-            results: [...prevValue.homes.results],
-            count: prevValue.homes.count + 333,
-          },
-        };
-      }
+  useEffect(() => {
+    getHomes({
+      variables: {
+        order: "RELEVANCE",
+        guests: 2,
+        region: null,
+        checkIn: null,
+        checkOut: null,
+        page: 1,
+        pageSize: PAGE_SIZE,
+      },
     });
+  }, []);
+
+  useEffect(() => {
+    getHomes({
+      variables: {
+        order: filters.order,
+        guests: filters.guests,
+        region: filters.region,
+        page: 1,
+        pageSize: PAGE_SIZE,
+      },
+    });
+  }, [
+    filters.region,
+    filters.order,
+    filters.guests,
+    filters.checkIn,
+    filters.checkOut,
+  ]);
+
+  const handleHomesData = async (data: any) => {
+    console.log("called completed");
+    setParsedHomesData(data);
+    if (filters.checkIn && filters.checkOut) {
+      console.log("call entrei handleHomesData filters");
+      const homeIds = data?.homes?.results.map((h) => h.id);
+      const resPrices = await getHomesPrice({
+        variables: {
+          ids: homeIds,
+          checkIn: format(filters.checkIn, "yyyy-MM-dd"),
+          checkOut: format(filters.checkOut, "yyyy-MM-dd"),
+        },
+      });
+      const { homesPricing } = resPrices.data;
+      const parsedNewResults = data.homes.results.map((h: any) => {
+        const homesPricingData = homesPricing.find((hp) => hp.homeId === h.id);
+        return { ...h, homePricing: { ...homesPricingData } };
+      });
+      const newValue = {
+        homes: {
+          results: [...parsedNewResults],
+          count: data.homes.count,
+        },
+      };
+      console.log("COM newValue", newValue);
+      setParsedHomesData(newValue);
+      return { ...newValue };
+    }
   };
 
-  const loadNextPage = async () => {
-    await fetchMore({
+  const loadNextPage = () => {
+    console.log("loadNextPage entrei");
+    const nextPage = currentPage + 1;
+    fetchMore({
       variables: {
         guests: filters.guests,
         region: filters.region,
         order: filters.order,
-        page: currentPage + 1,
+        page: nextPage,
         pageSize: PAGE_SIZE,
       },
+
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev;
         return {
@@ -139,32 +150,14 @@ const HomesProvider: React.FC = ({ children }) => {
         };
       },
     });
+
+    setCurrentPage(currentPage + 1);
   };
-
-  useEffect(() => {
-    !!homesData && console.log("called", { homesData });
-    // !!homesData && updateCacheValues();
-  }, [homesData]);
-
-  useEffect(() => {
-    const load = async () => {
-      const res = await refetch({
-        guests: filters.guests,
-        region: filters.region,
-        order: filters.order,
-        page: currentPage,
-        pageSize: PAGE_SIZE,
-      });
-      console.log("call refetch res", res);
-      await updateCacheValues();
-    };
-    load();
-  }, [filters]);
 
   return (
     <HomeContext.Provider
       value={{
-        homesData: homesData,
+        homesData: parsedHomesData,
         regionsData,
         loading,
         error,
@@ -201,6 +194,7 @@ export function useHomes() {
     loading,
     error,
     loadNextPage,
+    aa: () => console.log("cu"),
   };
 }
 

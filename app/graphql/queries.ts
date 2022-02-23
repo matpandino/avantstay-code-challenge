@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 
 export const QUERY_HOMES = gql`
-  query homes(
+  query HomesQuery(
     $page: Int!
     $pageSize: Int!
     $guests: Int!

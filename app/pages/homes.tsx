@@ -9,25 +9,18 @@ const Homes = () => {
   const [loadingResults, setLoadingResults] = useState(true);
   const { homesData, loading, error, pricesLoading } = useHomes();
 
-  useEffect(() => {
-    setLoadingResults(true);
-  }, []);
-
-  useEffect(() => {
-    setLoadingResults(loading);
-  }, [loading]);
-
   if (error) return <p>error: {console.log({ error })}</p>;
 
   return (
     <Container>
       {pricesLoading && "pricesLoading"}
-      {console.log("call homesDatahomesDatahomesData", homesData)}
+      {!!homesData && "homesData"}
+      {loading && "loading"}
       <HomesHeader
         loading={loadingResults}
         homesCount={homesData?.homes?.count}
       />
-      {loadingResults && <HomesLoadingBody />}
+      {loading && <HomesLoadingBody />}
       {!!homesData && <HomesResultsBody />}
     </Container>
   );
