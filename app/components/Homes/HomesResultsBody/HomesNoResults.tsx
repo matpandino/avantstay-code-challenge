@@ -3,19 +3,29 @@ import React from "react";
 import styled from "styled-components";
 
 import SatelliteIllustration from "../../../assets/illustration.svg";
+import useHomes from "../../../contexts/HomesContext/useHomes";
 import { Button } from "../../Button";
 
 const HomesNoResults = () => {
+  const {
+    filters: { regionName },
+  } = useHomes();
+  const regionsNameParsed =
+    !regionName || regionName === "all" ? "" : regionName;
+
   return (
     <Container>
       <div>
         <Image src={SatelliteIllustration} alt="Satellite Illustration" />
       </div>
       <p>
-        Oops! We haven’t found anything mathing your search. <br />
-        Try something else or reset the filters to see all region homes.
+        Oops! We haven’t found anything matching your search. <br />
+        Try something else or reset the filters to see all {
+          regionsNameParsed
+        }{" "}
+        homes.
       </p>
-      <Button size="lg" label="See all {region} homes" outlined />
+      <Button size="lg" label={`See all ${regionsNameParsed} homes`} outlined />
     </Container>
   );
 };

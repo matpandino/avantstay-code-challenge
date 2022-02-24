@@ -8,7 +8,7 @@ interface SelectFieldProps {
   width?: string;
   placeholder?: string;
   options: { value: string; label: string }[];
-  onChange?: (value: string) => void;
+  onChange?: (value: any) => void;
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -41,9 +41,9 @@ const SelectField: React.FC<SelectFieldProps> = ({
       selectRef={divRef}
     >
       <Container>
-        {options?.map(({ label, value: opValue }) => (
+        {options?.map(({ label, value: opValue }, index) => (
           <Option
-            key={opValue}
+            key={index}
             onClick={() => {
               divRef?.current?.blur();
               setSelectedField({ label, value: opValue });

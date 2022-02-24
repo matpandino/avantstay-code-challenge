@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Skeleton from "react-loading-skeleton";
-import { format } from "date-fns";
 import { useQuery } from "@apollo/client";
 
 import { Home, HomesPricing } from "../../../types";
@@ -45,8 +44,8 @@ type SeasonPricingProps = {
 type PricingProps = {
   coupon: string;
   homeId: string;
-  checkIn: Date;
-  checkOut: Date;
+  checkIn: string;
+  checkOut: string;
 };
 
 const HomeResultItem: React.FC<HomeResultItemProps> = ({ data: home }) => {
@@ -173,8 +172,8 @@ const TotalPricing: React.FC<PricingProps> = ({
     variables: {
       ids: [homeId],
       coupon: coupon,
-      checkIn: format(checkIn, "yyyy-MM-dd"),
-      checkOut: format(checkOut, "yyyy-MM-dd"),
+      checkIn: checkIn,
+      checkOut: checkOut,
     },
   });
 

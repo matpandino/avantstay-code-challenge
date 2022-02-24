@@ -6,7 +6,7 @@ module.exports = {
     return [
       {
         source: "/regions/:regionName",
-        destination: "/homes?q=regionName=:regionName",
+        destination: "/homes?regionName=:regionName",
       },
     ];
   },

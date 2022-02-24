@@ -62,7 +62,9 @@ export const SelectCustomField: React.FC<
         >
           <div>
             <label>{label}</label>
-            <span>{!!value ? value : placeholder}</span>
+            <TextValue isFilled={!!value}>
+              {!!value ? value : placeholder}
+            </TextValue>
           </div>
           <ArrowWrapper>
             {isOpen ? (
@@ -90,6 +92,15 @@ const ArrowWrapper = styled.div`
   margin-top: 20px;
 `;
 
+const TextValue = styled.span<{ isFilled: boolean }>`
+  width: 100%;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 142%;
+  color: #022b54;
+  opacity: ${({ isFilled }) => (isFilled ? 1 : 0.3)};
+  cursor: default;
+`;
 const SelectTextContainer = styled.div`
   display: flex;
   justify-content: space-between;
@@ -101,6 +112,12 @@ const SelectTextContainer = styled.div`
   div:first-child {
     display: flex;
     flex-direction: column;
+    label {
+      font-size: 11px;
+      color: #53c3d0;
+      width: 100%;
+      margin-bottom: 2px;
+    }
   }
 `;
 
@@ -136,21 +153,5 @@ const FieldContainer = styled.div<ContainerProps>`
   }
   :active {
     border: 2px solid #a3dfe6;
-  }
-  label {
-    font-size: 11px;
-    color: #53c3d0;
-    width: 100%;
-    margin-bottom: 2px;
-  }
-
-  > span {
-    width: 100%;
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 142%;
-    color: #022b54;
-    opacity: ${({ isFilled }) => (isFilled ? 1 : 0.3)};
-    cursor: default;
   }
 `;

@@ -10,7 +10,11 @@ interface SelectFieldProps {
   label: string;
   width?: string;
   placeholder?: string;
-  onChange?: (value: { startDate: Date; endDate: Date; key: string }) => void;
+  onChange?: (value: {
+    startDate: string;
+    endDate: string;
+    key: string;
+  }) => void;
 }
 
 const SelectDateRangeField: React.FC<SelectFieldProps> = ({
@@ -27,7 +31,12 @@ const SelectDateRangeField: React.FC<SelectFieldProps> = ({
   });
 
   useEffect(() => {
-    onChange && onChange(state);
+    onChange &&
+      onChange({
+        endDate: format(state.endDate, "yyyy-MM-dd"),
+        startDate: format(state.startDate, "yyyy-MM-dd"),
+        key: state.key,
+      });
   }, [state.startDate, state.endDate]);
 
   const formatedValue = alreadySearched

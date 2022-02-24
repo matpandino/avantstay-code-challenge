@@ -23,6 +23,7 @@ export const FiltersHomeBorder = styled.div`
   height: 100%;
   position: absolute;
   top: 0;
+  border-radius: 2px;
   border: 1px solid #e8eff5;
   left: 0;
 `;

@@ -36,7 +36,7 @@ const MenuItems = () => (
     <NavLink label="Find Homes" href="/homes" />
     <NavLink label="Partners" href="#" />
     <NavLink label="Company Retreats" href="#" />
-    <NavLink label="More" href="#" />
+    <NavLink label="More" withArrow href="#" />
   </MenuItemsContainer>
 );
 

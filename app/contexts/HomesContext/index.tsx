@@ -1,12 +1,20 @@
-import { createContext, useState, Dispatch, SetStateAction } from "react";
+import {
+  createContext,
+  useState,
+  Dispatch,
+  SetStateAction,
+  useEffect,
+} from "react";
 import { HomeQueryResponse } from "../../types";
 import { ApolloError, NetworkStatus, useQuery } from "@apollo/client";
 import { QUERY_HOMES, QUERY_REGIONS } from "../../graphql/queries";
+import { useRouter } from "next/router";
 
 type IFilters = {
   order: string;
   guests: number | null;
   region: string | null;
+  regionName: string | null;
   checkIn: string;
   checkOut: string;
   coupon: string;
@@ -24,7 +32,6 @@ interface IContextProps {
 }
 
 export const HomesContext = createContext({} as IContextProps);
-
 const PAGE_SIZE = 10;
 
 const HomesProvider: React.FC = ({ children }) => {
@@ -32,6 +39,7 @@ const HomesProvider: React.FC = ({ children }) => {
     order: "RELEVANCE",
     guests: 2,
     region: null,
+    regionName: "",
     checkIn: "",
     checkOut: "",
     coupon: "",
@@ -39,6 +47,7 @@ const HomesProvider: React.FC = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data: regionsData } = useQuery(QUERY_REGIONS);
+  const router = useRouter();
 
   const {
     data: homesData,
@@ -80,6 +89,29 @@ const HomesProvider: React.FC = ({ children }) => {
     });
     setCurrentPage(currentPage + 1);
   };
+
+  useEffect(() => {
+    console.log(
+      "useEffect fired!",
+      { asPath: router.asPath },
+      { query: router.query.regionName }
+    );
+    const { regionName, order, guests } = router.query;
+    const filtersFromUrlQuery = {
+      // ...(regionName && { region: regionName }),
+      ...(typeof order === "string" && { order }),
+      ...(typeof guests === "string" && { guests: Number(guests) }),
+    };
+
+    const newFilters = {
+      ...filters,
+      ...filtersFromUrlQuery,
+    };
+    console.log("router obj + filters ");
+    console.log("router obj", { filtersFromUrlQuery });
+
+    setFilters({ ...newFilters });
+  }, [router.asPath]);
 
   return (
     <HomesContext.Provider

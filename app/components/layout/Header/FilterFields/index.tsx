@@ -18,11 +18,14 @@ const FiltersFields = () => {
   const regionsOptions = useMemo(() => {
     const parsedRegions = regionsData?.regions.map((region: any) => ({
       label: `${region.name}, ${region.stateCode}`,
-      value: region.id,
+      value: { id: region.id, name: region.name },
     }));
     if (!!parsedRegions)
-      return [{ label: "All regions", value: null }, ...parsedRegions];
-    return [{ label: "All regions", value: null }];
+      return [
+        { label: "All regions", value: { id: null, name: "all" } },
+        ...parsedRegions,
+      ];
+    return [{ label: "All regions", value: { id: null, name: "all" } }];
   }, [regionsData]);
 
   const orderOptions = [
@@ -42,7 +45,11 @@ const FiltersFields = () => {
             width="33%"
             placeholder="Select..."
             onChange={(value) => {
-              setFilters({ ...filters, region: value });
+              setFilters({
+                ...filters,
+                region: value.id,
+                regionName: value.name,
+              });
             }}
           />
           <Divider />
