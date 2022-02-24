@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 
 interface FieldProps {
@@ -6,6 +6,7 @@ interface FieldProps {
   outlined?: boolean;
   placeholder?: string;
   width?: string;
+  onChangeValue?: (value: string) => void;
 }
 
 interface InputProps {
@@ -23,6 +24,7 @@ export const InputField: React.FC<
   width,
   outlined = false,
   placeholder = "Select...",
+  onChangeValue,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -39,6 +41,10 @@ export const InputField: React.FC<
     active: "#A3DFE6",
     filled: "#E8EFF5",
   };
+
+  useEffect(() => {
+    onChangeValue && onChangeValue(input);
+  }, [input]);
 
   return (
     <>

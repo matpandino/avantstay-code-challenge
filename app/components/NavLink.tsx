@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 type NavLinkProps = {
   label: string;
@@ -13,11 +12,11 @@ const NavLink: React.FC<NavLinkProps> = ({
   children,
   ...props
 }) => {
-  const router = useRouter();
+  const isActive = href.includes("homes") ? true : false;
 
   return (
     <Link href={href} passHref>
-      <NavLinkContainer pathName={router.pathname} {...props}>
+      <NavLinkContainer isActive={isActive} {...props}>
         {label}
         <div />
       </NavLinkContainer>
@@ -25,7 +24,7 @@ const NavLink: React.FC<NavLinkProps> = ({
   );
 };
 
-const NavLinkContainer = styled.a<{ pathName: string }>`
+const NavLinkContainer = styled.a<{ isActive: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -34,13 +33,15 @@ const NavLinkContainer = styled.a<{ pathName: string }>`
   font-weight: 400;
   height: 28px;
   text-decoration: none;
-  color: ${(props) => (props.href === props.pathName ? "#53c3d0" : "#022b54")};
+  color: ${({ isActive }) => (isActive ? "#53c3d0" : "#022b54")};
+  position: relative;
   div {
+    position: absolute;
     width: 20px;
-    margin-top: 8px;
+    margin-top: 34px;
     height: 1px;
-    background-color: ${({ href, pathName }) =>
-      href === pathName ? "#53c3d0" : "transparent"};
+    background-color: ${({ isActive }) =>
+      isActive ? "#53c3d0" : "transparent"};
     border-radius: 12px;
   }
   :hover,

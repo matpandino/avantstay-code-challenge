@@ -4,7 +4,6 @@ const GlobalStyle = createGlobalStyle`
 
   html, body {
     height: 100%;
-    overflow: hidden;
   }
 
   * {
@@ -20,7 +19,8 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     background: #FFFFFF;
     font-family: 'Source Sans Pro', sans-serif;
-    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   button, input[type="submit"], input[type="reset"] {

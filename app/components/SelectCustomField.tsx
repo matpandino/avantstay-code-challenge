@@ -1,5 +1,8 @@
+import Image from "next/image";
 import { RefObject, useRef, useState } from "react";
 import styled from "styled-components";
+import chevronDown from "../assets/chevron_down.svg";
+import chevronUp from "../assets/chevron_up.svg";
 
 interface FieldProps {
   label: string;
@@ -11,13 +14,12 @@ interface FieldProps {
   selectRef?: RefObject<HTMLDivElement>;
 }
 
-interface InputProps {
+interface ContainerProps {
   outlined?: boolean;
-  isFocused?: boolean;
+  isOpen?: boolean;
   isFilled?: boolean;
   width?: string;
   modalWidth?: string;
-  colors: { default: string; hover: string; active: string; filled: string };
 }
 
 export const SelectCustomField: React.FC<
@@ -35,29 +37,41 @@ export const SelectCustomField: React.FC<
   const [isOpen, setIsOpen] = useState(false);
   const [dontClose, setDontClose] = useState(false);
 
-  const divRef = !!selectRef ? selectRef : useRef<HTMLDivElement | null>(null);
-
-  const colors = {
-    default: "#E8EFF5",
-    hover: "#D1EFF2",
-    active: "#A3DFE6",
-    filled: "#E8EFF5",
+  const containerRef = !!selectRef
+    ? selectRef
+    : useRef<HTMLDivElement | null>(null);
+  const closeAll = () => {
+    setIsOpen(false);
+    setDontClose(false);
   };
-
   return (
     <>
       <FieldContainer
         outlined={outlined}
         isFilled={!!value}
         tabIndex={1}
-        colors={colors}
         width={width}
-        ref={divRef}
-        onFocus={() => setIsOpen(true)}
-        onBlur={() => setIsOpen(false)}
+        isOpen={isOpen || dontClose}
+        ref={containerRef}
+        onBlur={() => !dontClose && closeAll()}
       >
-        <label>{label}</label>
-        <span>{!!value ? value : placeholder}</span>
+        <SelectTextContainer
+          onClick={() => {
+            !isOpen ? setIsOpen(true) : closeAll();
+          }}
+        >
+          <div>
+            <label>{label}</label>
+            <span>{!!value ? value : placeholder}</span>
+          </div>
+          <ArrowWrapper>
+            {isOpen ? (
+              <Image src={chevronUp} width={16} height={16} />
+            ) : (
+              <Image src={chevronDown} width={16} height={16} />
+            )}
+          </ArrowWrapper>
+        </SelectTextContainer>
         {(isOpen || dontClose) && (
           <Modal
             modalWidth={modalWidth}
@@ -72,21 +86,39 @@ export const SelectCustomField: React.FC<
   );
 };
 
+const ArrowWrapper = styled.div`
+  margin-top: 20px;
+`;
+
+const SelectTextContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font-size: 13px;
+  /* margin-bottom: 5px; */
+
+  div:first-child {
+    display: flex;
+    flex-direction: column;
+  }
+`;
+
 const Modal = styled.div<{ modalWidth?: string }>`
+  transition: all 3s ease-in-out;
   display: flex;
   position: absolute;
-  overflow: auto;
   margin-top: 10px;
   background-color: #ffffff;
   margin-right: 4px;
   width: ${({ modalWidth }) => (!!modalWidth ? modalWidth : "auto")};
   top: 44px;
-  border: 1px solid #e8eff5;
+  border: 2px solid #a3dfe6;
   border-radius: 2px;
   cursor: default;
 `;
 
-const FieldContainer = styled.div<InputProps>`
+const FieldContainer = styled.div<ContainerProps>`
   all: unset;
   position: relative;
   display: flex;
@@ -95,27 +127,15 @@ const FieldContainer = styled.div<InputProps>`
   flex-direction: column;
   border-radius: 3px;
   box-sizing: border-box;
-  height: 50px;
+  min-height: 50px;
   width: ${({ width }) => (!!width ? width : "auto")};
-  padding: ${({ isFocused, isFilled }) => {
-    if (isFocused) return "7px 7px 7px 14px !important";
-    if (isFilled) return "7px 7px 7px 14px";
-    return "7px 7px 7px 14px";
-  }};
-  border: ${({ isFocused, isFilled, outlined, colors }) => {
-    if (isFocused) return `1px solid ${colors.active} !important`;
-    if (isFilled && outlined) return `1px solid ${colors.filled}`;
-    if (outlined) return `1px solid ${colors.default}`;
-    return "1px solid transparent";
-  }};
+  padding: 7px 7px 7px 14px;
+  border: 2px solid ${({ isOpen }) => (isOpen ? "#a3dfe6" : "transparent")};
   :hover {
-    border: ${({ colors }) => `1px solid ${colors.hover}`};
-    padding: 7px 7px 7px 14px;
+    border: 2px solid ${({ isOpen }) => (isOpen ? "#a3dfe6" : "#d1eff2")};
   }
   :active {
-    border: ${({ outlined, colors }) =>
-      outlined ? `1px solid ${colors.active}` : "1x solid transparent"};
-    padding: 7px 7px 7px 14px;
+    border: 2px solid #a3dfe6;
   }
   label {
     font-size: 11px;

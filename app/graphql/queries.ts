@@ -7,6 +7,8 @@ export const QUERY_HOMES = gql`
     $guests: Int!
     $order: HomesOrder
     $region: UUID
+    $checkIn: ISODate!
+    $checkOut: ISODate!
   ) {
     homes(
       page: $page
@@ -14,6 +16,7 @@ export const QUERY_HOMES = gql`
       guests: $guests
       order: $order
       region: $region
+      period: { checkIn: $checkIn, checkOut: $checkOut }
     ) {
       results {
         id
@@ -47,12 +50,17 @@ export const QUERY_HOMES = gql`
 `;
 
 export const QUERY_HOMES_PRICING = gql`
-  query homes($ids: [UUID]!, $checkIn: ISODate!, $checkOut: ISODate!) {
+  query homes(
+    $ids: [UUID]!
+    $checkIn: ISODate!
+    $checkOut: ISODate!
+    $coupon: String
+  ) {
     homesPricing(
       ids: $ids
+      coupon: $coupon
       period: { checkIn: $checkIn, checkOut: $checkOut }
     ) {
-      homeId
       numberOfNights
       total
     }

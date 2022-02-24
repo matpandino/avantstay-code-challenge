@@ -44,7 +44,6 @@ const SelectCounterField: React.FC<SelectCounterFieldProps> = ({
       value={!!count ? `${count} guests` : ""}
       label={label}
       width={width}
-      modalWidth="100%"
       placeholder={placeholder}
     >
       <CounterContainer>
@@ -65,8 +64,11 @@ const CounterContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 8px;
+  color: #022b54;
+
   span {
     font-size: 15px;
+    margin-right: 40px;
   }
   div {
     display: flex;

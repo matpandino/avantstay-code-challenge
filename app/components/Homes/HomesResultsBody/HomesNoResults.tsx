@@ -8,7 +8,9 @@ import { Button } from "../../Button";
 const HomesNoResults = () => {
   return (
     <Container>
-      <Image src={SatelliteIllustration} alt="Satellite Illustration" />
+      <div>
+        <Image src={SatelliteIllustration} alt="Satellite Illustration" />
+      </div>
       <p>
         Oops! We haven’t found anything mathing your search. <br />
         Try something else or reset the filters to see all region homes.
@@ -24,6 +26,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   text-align: center;
+  height: 100%;
   p {
     margin: 40px;
     font-weight: 400;
@@ -32,6 +35,28 @@ const Container = styled.div`
   }
   button {
     width: 211px;
+  }
+
+  div {
+    -webkit-animation: mover 2s infinite alternate;
+    animation: mover 2s infinite alternate;
+  }
+
+  @-webkit-keyframes mover {
+    0% {
+      transform: translateY(5px);
+    }
+    100% {
+      transform: translateY(-5px);
+    }
+  }
+  @keyframes mover {
+    0% {
+      transform: translateY(5px);
+    }
+    100% {
+      transform: translateY(-5px);
+    }
   }
 `;
 export default HomesNoResults;

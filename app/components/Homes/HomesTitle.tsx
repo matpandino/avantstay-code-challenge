@@ -6,7 +6,7 @@ interface LoadingHomesProps {
   homesCount?: number;
 }
 
-const HomesHeader: React.FC<LoadingHomesProps> = ({ loading, homesCount }) => {
+const HomesTitle: React.FC<LoadingHomesProps> = ({ loading, homesCount }) => {
   return (
     <Container>
       <SmallText>
@@ -57,4 +57,4 @@ const Container = styled.div`
   align-items: start;
   width: 100%;
 `;
-export default HomesHeader;
+export default HomesTitle;

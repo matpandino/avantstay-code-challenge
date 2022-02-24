@@ -59,14 +59,15 @@ const SelectField: React.FC<SelectFieldProps> = ({
 
 const Container = styled.div`
   width: 100%;
-  max-height: 250px;
   overflow: auto;
+  max-height: 250px;
+  color: #022b54;
 `;
 
 const Option = styled.div`
   display: flex;
   flex: 1;
-  padding: 4px 8px;
+  padding: 8px;
   font-size: 13px;
   :hover {
     background-color: #ecfafa;

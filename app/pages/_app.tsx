@@ -2,14 +2,21 @@ import React from "react";
 import App from "next/app";
 import GlobalStyle from "../theme/globalStyle";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
-import Layout from "../components/layout";
+import { BatchHttpLink } from "@apollo/client/link/batch-http";
+import Layout from "../components/Layout";
 import HomesProvider from "../contexts/HomesContext";
+import Head from "next/head";
 
-const cache = new InMemoryCache();
+const link = new BatchHttpLink({
+  uri: "https://fake-api.avantstay.dev/graphql",
+  batchMax: 10, // No more than 10 operations per batch
+  batchInterval: 50, // Wait no more than 50ms after first batched operation
+  batchDebounce: true,
+});
 
 const client = new ApolloClient({
-  uri: "https://fake-api.avantstay.dev/graphql",
-  cache: cache,
+  cache: new InMemoryCache(),
+  link: link,
 });
 
 class MyApp extends App {
@@ -17,6 +24,9 @@ class MyApp extends App {
     const { Component, pageProps } = this.props;
     return (
       <>
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Head>
         <ApolloProvider client={client}>
           <GlobalStyle />
           <HomesProvider>

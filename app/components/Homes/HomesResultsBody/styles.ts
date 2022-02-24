@@ -36,6 +36,8 @@ export const PriceText = styled.span`
 `;
 
 export const TitleText = styled(PriceText)`
+  font-family: "SangBleu Sunrise";
+  font-weight: 700;
   margin-top: 8px;
   margin-bottom: 10px;
 `;
@@ -84,4 +86,10 @@ export const Container = styled.div`
   > div {
     width: 100%;
   }
+`;
+
+export const HomeDivider = styled.hr`
+  border: none;
+  border-top: 2px solid #f4f7fa;
+  margin: 5px 0px;
 `;

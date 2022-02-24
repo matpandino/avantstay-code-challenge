@@ -1,10 +1,15 @@
 import Image from "next/image";
-import { Home } from "../../../types";
+import Skeleton from "react-loading-skeleton";
+import { format } from "date-fns";
+import { useQuery } from "@apollo/client";
+
+import { Home, HomesPricing } from "../../../types";
 import { formatCurrency } from "../../../utils/formatCurrency";
 import {
   ContainerHomeResult,
   ContainerImage,
   ContainerInfo,
+  HomeDivider,
   PriceText,
   SeasonPricingContainer,
   SeasonPricingsContainer,
@@ -19,7 +24,8 @@ import UserIcon from "../../../assets/arrangmentsIcons/user.svg";
 import PoolIcon from "../../../assets/arrangmentsIcons/pool.svg";
 import HighIcon from "../../../assets/high.svg";
 import LowIcon from "../../../assets/low.svg";
-import Skeleton from "react-loading-skeleton";
+import { QUERY_HOMES_PRICING } from "../../../graphql/queries";
+import useHomes from "../../../contexts/HomesContext/useHomes";
 
 type HomeResultItemProps = {
   data: Home;
@@ -37,60 +43,61 @@ type SeasonPricingProps = {
 };
 
 type PricingProps = {
-  total: number;
-  numberOfNights: number;
+  coupon: string;
+  homeId: string;
+  checkIn: Date;
+  checkOut: Date;
 };
 
-const HomeResultItem: React.FC<HomeResultItemProps> = ({
-  data: home,
-  loadingPrices,
-}) => {
-  return (
-    <ContainerHomeResult>
-      <ContainerImage>
-        <Image
-          src={home.photos[0].url}
-          alt={"Picture of the home"}
-          objectFit="cover"
-          quality={50}
-          height={208}
-          width={390}
-        />
-      </ContainerImage>
-      <ContainerInfo>
-        <SmallLocationText>
-          {home.regionName} - {home.cityName}, {home.stateCode}
-        </SmallLocationText>
-        <TitleText>{home.title}</TitleText>
-        <Arrangements data={home} />
+const HomeResultItem: React.FC<HomeResultItemProps> = ({ data: home }) => {
+  const {
+    filters: { checkIn, checkOut, coupon },
+  } = useHomes();
 
-        {loadingPrices ? (
-          <div>
-            <Skeleton height="17px" width="34%" borderRadius="2px" />
-            <Skeleton height="28px" width="41%" borderRadius="2px" />
-            <Skeleton height="17px" width="15%" borderRadius="2px" />
-          </div>
-        ) : !!home?.homePricing?.total ? (
-          <TotalPricing
-            total={home.homePricing.total}
-            numberOfNights={home.homePricing.numberOfNights}
+  return (
+    <>
+      <ContainerHomeResult>
+        <ContainerImage>
+          <Image
+            src={`${home.photos[0].url}?height=${208}&&width=${390}`}
+            alt={"Picture of the home"}
+            layout="fill"
+            objectFit="cover"
+            quality={50}
           />
-        ) : (
-          <SeasonPricingsContainer>
-            <SeasonPricing
-              type="lowSeason"
-              minPrice={home.seasonPricing.lowSeason.minPrice}
-              maxPrice={home.seasonPricing.lowSeason.maxPrice}
+        </ContainerImage>
+        <ContainerInfo>
+          <SmallLocationText>
+            {home.regionName} - {home.cityName}, {home.stateCode}
+          </SmallLocationText>
+          <TitleText>{home.title}</TitleText>
+          <Arrangements data={home} />
+
+          {!!checkIn && !!checkOut ? (
+            <TotalPricing
+              homeId={home.id}
+              checkIn={checkIn}
+              checkOut={checkOut}
+              coupon={coupon}
             />
-            <SeasonPricing
-              type="highSeason"
-              minPrice={home.seasonPricing.highSeason.minPrice}
-              maxPrice={home.seasonPricing.highSeason.maxPrice}
-            />
-          </SeasonPricingsContainer>
-        )}
-      </ContainerInfo>
-    </ContainerHomeResult>
+          ) : (
+            <SeasonPricingsContainer>
+              <SeasonPricing
+                type="lowSeason"
+                minPrice={home.seasonPricing.lowSeason.minPrice}
+                maxPrice={home.seasonPricing.lowSeason.maxPrice}
+              />
+              <SeasonPricing
+                type="highSeason"
+                minPrice={home.seasonPricing.highSeason.minPrice}
+                maxPrice={home.seasonPricing.highSeason.maxPrice}
+              />
+            </SeasonPricingsContainer>
+          )}
+        </ContainerInfo>
+      </ContainerHomeResult>
+      <HomeDivider />
+    </>
   );
 };
 
@@ -125,7 +132,6 @@ const SeasonPricing: React.FC<SeasonPricingProps> = ({
   maxPrice,
 }) => {
   const isHighSeason = type === "highSeason";
-
   return (
     <>
       <SeasonPricingContainer>
@@ -147,13 +153,47 @@ const SeasonPricing: React.FC<SeasonPricingProps> = ({
   );
 };
 
-const TotalPricing: React.FC<PricingProps> = ({ total, numberOfNights }) => {
+const LoadingPricing = () => (
+  <div>
+    <Skeleton height="17px" width="34%" borderRadius="2px" />
+    <Skeleton height="28px" width="41%" borderRadius="2px" />
+    <Skeleton height="17px" width="15%" borderRadius="2px" />
+  </div>
+);
+
+const TotalPricing: React.FC<PricingProps> = ({
+  homeId,
+  checkIn,
+  checkOut,
+  coupon,
+}) => {
+  const { data: pricingData, loading: loadingPrices } = useQuery<{
+    homesPricing: HomesPricing[];
+  }>(QUERY_HOMES_PRICING, {
+    variables: {
+      ids: [homeId],
+      coupon: coupon,
+      checkIn: format(checkIn, "yyyy-MM-dd"),
+      checkOut: format(checkOut, "yyyy-MM-dd"),
+    },
+  });
+
+  if (loadingPrices || !pricingData) return <LoadingPricing />;
+
+  const homesPricing = pricingData.homesPricing;
+  const homesPricingData = homesPricing[0];
+
   return (
     <>
       <SeasonPricingContainer>
-        <SmallText>Total - {numberOfNights} nights</SmallText>
-        <PriceText>{formatCurrency(total)}</PriceText>
-        <SmallText>per night</SmallText>
+        <SmallText>Total - {homesPricingData.numberOfNights} nights</SmallText>
+        <PriceText>{formatCurrency(homesPricingData.total)}</PriceText>
+        <SmallText>
+          {formatCurrency(
+            homesPricingData.total / homesPricingData.numberOfNights
+          )}{" "}
+          per night
+        </SmallText>
       </SeasonPricingContainer>
     </>
   );
