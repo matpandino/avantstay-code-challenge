@@ -1,14 +1,25 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  RefObject,
+  useCallback,
+} from "react";
 import styled from "styled-components";
 import { SelectCustomField } from "./SelectCustomField";
+type RegionsField = { id: string | null; name: string | null };
+type Field = {
+  value: string | RegionsField;
+  label: string;
+};
 
 interface SelectFieldProps {
-  label: string;
-  defaultValue?: string;
-  width?: string;
+  defaultValue?: Field;
+  options: Field[];
   placeholder?: string;
-  options: { value: string; label: string }[];
-  onChange?: (value: any) => void;
+  width?: string;
+  label: string;
+  onChange?: (value: Field) => void;
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -19,21 +30,26 @@ const SelectField: React.FC<SelectFieldProps> = ({
   options,
   defaultValue,
 }) => {
-  const [selectedField, setSelectedField] = useState(
-    (defaultValue && options.find(({ value }) => value === defaultValue)) || {
-      value: "",
-      label: "",
-    }
+  const [selectedField, setSelectedField] = useState<Field | null>(
+    !!defaultValue ? defaultValue : null
   );
-  const divRef = useRef<any | null>(null);
+  const divRef = useRef() as RefObject<HTMLDivElement>;
 
   useEffect(() => {
-    onChange && onChange(selectedField.value);
-  }, [selectedField.value]);
+    if (!!selectedField?.value) {
+      onChange && onChange(selectedField.value);
+    }
+  }, [selectedField]);
+
+  useEffect(() => {
+    if (!!defaultValue && defaultValue !== selectedField) {
+      setSelectedField(defaultValue);
+    }
+  }, [defaultValue]);
 
   return (
     <SelectCustomField
-      value={`${selectedField.label}`}
+      value={`${selectedField?.label || ""}`}
       label={label}
       width={width}
       placeholder={placeholder}
@@ -41,15 +57,15 @@ const SelectField: React.FC<SelectFieldProps> = ({
       selectRef={divRef}
     >
       <Container>
-        {options?.map(({ label, value: opValue }, index) => (
+        {options?.map((option, index) => (
           <Option
             key={index}
             onClick={() => {
               divRef?.current?.blur();
-              setSelectedField({ label, value: opValue });
+              setSelectedField(option);
             }}
           >
-            {label}
+            {option.label}
           </Option>
         ))}
       </Container>

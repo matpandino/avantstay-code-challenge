@@ -22,19 +22,32 @@ export type Home = {
   stateCode: string;
 };
 
-export type HomesPricing = {
-  numberOfNights: number;
-  total: number;
-};
-
 export type HomeSeasonPricing = {
   highSeason: PriceRange;
   lowSeason: PriceRange;
 };
 
 export type PriceRange = {
+  homeId: string;
   minPrice: number;
   maxPrice: number;
 };
 
 export type HomeQueryResponse = { homes: { results: Home[]; count: number } };
+
+export type HomesPricing = {
+  numberOfNights: number;
+  total: number;
+};
+
+export type HomesPricingQueryResponse = { homesPricing: HomesPricing[] };
+
+export type Region = {
+  id: string;
+  name: string;
+  stateName: string;
+  stateCode: string;
+};
+export type RegionsQueryResponse = {
+  regions: Region[];
+};

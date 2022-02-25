@@ -3,7 +3,6 @@ import { gql } from "@apollo/client";
 export const QUERY_HOMES = gql`
   query HomesQuery(
     $page: Int!
-    $pageSize: Int!
     $guests: Int!
     $order: HomesOrder
     $region: UUID
@@ -12,7 +11,7 @@ export const QUERY_HOMES = gql`
   ) {
     homes(
       page: $page
-      pageSize: $pageSize
+      pageSize: 10
       guests: $guests
       order: $order
       region: $region

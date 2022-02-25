@@ -6,7 +6,7 @@ interface FieldProps {
   outlined?: boolean;
   placeholder?: string;
   width?: string;
-  onChangeValue?: (value: string) => void;
+  value: string;
 }
 
 interface InputProps {
@@ -24,11 +24,9 @@ export const InputField: React.FC<
   width,
   outlined = false,
   placeholder = "Select...",
-  onChangeValue,
   ...props
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [input, setInput] = useState("");
 
   const inputRef = useRef() as React.MutableRefObject<HTMLInputElement>;
 
@@ -42,15 +40,11 @@ export const InputField: React.FC<
     filled: "#E8EFF5",
   };
 
-  useEffect(() => {
-    onChangeValue && onChangeValue(input);
-  }, [input]);
-
   return (
     <>
       <FieldContainer
         outlined={outlined}
-        isFilled={!!input}
+        isFilled={!!inputRef?.current?.value}
         isFocused={isFocused}
         colors={largeInputColors}
         width={width}
@@ -61,8 +55,6 @@ export const InputField: React.FC<
           ref={inputRef}
           onFocus={onFocus}
           onBlur={onBlur}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
           colors={largeInputColors}
           outlined={outlined}
           placeholder={placeholder}

@@ -16,7 +16,7 @@ const FiltersFields = () => {
   const { regionsData, filters, setFilters } = useHomes();
 
   const regionsOptions = useMemo(() => {
-    const parsedRegions = regionsData?.regions.map((region: any) => ({
+    const parsedRegions = regionsData?.regions.map((region) => ({
       label: `${region.name}, ${region.stateCode}`,
       value: { id: region.id, name: region.name },
     }));
@@ -43,6 +43,9 @@ const FiltersFields = () => {
             options={regionsOptions}
             label="Where"
             width="33%"
+            defaultValue={regionsOptions.find(
+              (r) => r.value.name === filters.regionName
+            )}
             placeholder="Select..."
             onChange={(value) => {
               setFilters({
@@ -57,6 +60,8 @@ const FiltersFields = () => {
             label="When"
             width="33%"
             placeholder="Select..."
+            checkIn={filters.checkIn}
+            checkOut={filters.checkOut}
             onChange={(value) => {
               setFilters({
                 ...filters,
@@ -69,6 +74,7 @@ const FiltersFields = () => {
           <SelectCounterField
             label="Who"
             width="22%"
+            value={filters.guests}
             counterText="Guests"
             placeholder="Select..."
             onChange={(value) => {
@@ -77,13 +83,15 @@ const FiltersFields = () => {
           />
           <Divider />
           <SelectField
-            defaultValue={"RELEVANCE"}
+            defaultValue={orderOptions.find((f) => f.value === filters.order)}
             options={orderOptions}
             label="Order"
             width="22%"
             placeholder="Select..."
             onChange={(value) => {
-              setFilters({ ...filters, order: value });
+              if (value !== filters.order) {
+                setFilters({ ...filters, order: value });
+              }
             }}
           />
         </Stack>
@@ -92,8 +100,9 @@ const FiltersFields = () => {
         label="Coupon"
         width="14%"
         placeholder="Got a code?"
-        onChangeValue={(value) => {
-          setFilters({ ...filters, coupon: value });
+        value={filters.coupon}
+        onChange={(e) => {
+          setFilters({ ...filters, coupon: e.currentTarget.value });
         }}
         outlined
       />

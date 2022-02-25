@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
 import { SelectCustomField } from "./SelectCustomField";
 
@@ -7,30 +7,35 @@ interface SelectCounterFieldProps {
   width?: string;
   placeholder?: string;
   counterText?: string;
-  initialCount?: number;
+  value?: number;
   onChange?: (value: number) => void;
 }
 
 const SelectCounterField: React.FC<SelectCounterFieldProps> = ({
-  initialCount = 0,
+  value = 0,
   label,
   width,
   placeholder,
   counterText,
   onChange,
 }) => {
-  const [count, setCount] = useState(initialCount);
+  const [count, setCount] = useState(value);
 
   useEffect(() => {
     onChange && onChange(count);
   }, [count]);
 
-  const handleMinus = () => {
-    if (count > 1) setCount(count - 1);
-  };
-  const handlePlus = () => {
+  useEffect(() => {
+    setCount(value);
+  }, [value]);
+
+  const handlePlus = useCallback(() => {
     setCount(count + 1);
-  };
+  }, [count]);
+
+  const handleMinus = useCallback(() => {
+    setCount(count - 1);
+  }, [count]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = Number(e.target.value);
